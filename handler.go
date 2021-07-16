@@ -76,7 +76,7 @@ func (s *Server) GenerateLink(rw http.ResponseWriter, req *http.Request) {
 	}
 
 	if err := s.Store.AddURL(context.Background(), nl); err != nil {
-		if err != linkAlreadyExistsError {
+		if err != errLinkAlreadyExists {
 			log.Println(err)
 			rw.WriteHeader(http.StatusInternalServerError)
 			return

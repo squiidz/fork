@@ -39,7 +39,7 @@ export default {
   },
 
   data() {
-    let apiURL = "https://fork.pw";
+    let apiURL = "https://api.fork.pw";
     if (window.location.href.includes("localhost")) {
       apiURL = "http://localhost:8080"
     }

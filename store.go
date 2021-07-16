@@ -9,11 +9,11 @@ import (
 )
 
 var (
-	projectID              = "our-axon-319717"
-	linkColName            = "link"
-	counterColName         = "counter"
-	countDocName           = "count"
-	linkAlreadyExistsError = errors.New("Link Already exists")
+	projectID            = "our-axon-319717"
+	linkColName          = "link"
+	counterColName       = "counter"
+	countDocName         = "count"
+	errLinkAlreadyExists = errors.New("Link Already exists")
 )
 
 // Store maintains the client for the firestore and the global counter
@@ -52,7 +52,7 @@ func (s *Store) AddURL(ctx context.Context, l *Link) error {
 		_, err := s.db.Collection(linkColName).Doc(l.Short).Set(ctx, l)
 		return err
 	}
-	return linkAlreadyExistsError
+	return errLinkAlreadyExists
 }
 
 // GetURL gets a link from the store based on the provided short id

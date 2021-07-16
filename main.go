@@ -16,6 +16,8 @@ var (
 	env     = flag.String("env", "dev", "--env env name")
 	url     = flag.String("url", "http://localhost", "--url domain name")
 	intPort = flag.String("intPort", "8080", "--intPort 8080")
+	devEnv  = "dev"
+	prod    = "cloud"
 )
 
 // Server contains the base URL for creating the short link urls
@@ -51,16 +53,16 @@ func main() {
 
 	srvr := NewServer(*env, *url, *intPort)
 
-	r.HandleFunc("/gen-link", http.HandlerFunc(srvr.GenerateLink)).Methods("POST", "OPTIONS")
-	r.HandleFunc("/update-link", http.HandlerFunc(srvr.UpdateLink)).Methods("POST", "OPTIONS")
+	r.Handle("/gen-link", allowCORS(http.HandlerFunc(srvr.GenerateLink))).Methods("POST", "OPTIONS")
+	r.Handle("/update-link", allowCORS(http.HandlerFunc(srvr.UpdateLink))).Methods("POST", "OPTIONS")
 	r.HandleFunc("/info-link/{id}", http.HandlerFunc(srvr.InfoLink)).Methods("GET")
 	r.HandleFunc("/{id}", http.HandlerFunc(srvr.FowardLinkHandler)).Methods("GET", "OPTIONS")
 
 	r.HandleFunc("/", HomeHandler)
-	if *env == "dev" {
+	if *env == devEnv {
 		r.PathPrefix("/").Handler(http.HandlerFunc(StaticHandler))
 	}
 
 	log.Printf("Running on %s with URL %s:%s\n", *env, *url, *intPort)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *intPort), clw.Merge(allowCORS(r))))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", *intPort), clw.Merge(r)))
 }
