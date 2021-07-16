@@ -24,12 +24,12 @@ It accepts `POST, OPTIONS` methods.
 ```
 - `/info-link/{id}` returns the info about an existing link, `{id}` needs to be replace with a short url id.
 - It accepts `GET` method.
-``` bash
-	curl -XGET https://fork.pw/info-link/yBbPUt
+``` console
+curl -XGET https://fork.pw/info-link/yBbPUt
 ```
 - `/{id}` redirects the short link to the long url. `{id}` needs to be replace with a short url id.
 In case that the upstream site is down it will fallback to a WaybackMachine snapshot.
 It accept `GET` method.
-``` bash
-	curl -XGET https://fork.pw/yBbPUt
+``` console
+curl -XGET https://fork.pw/yBbPUt
 ```
