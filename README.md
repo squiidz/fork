@@ -9,6 +9,9 @@ The project is host in two separated parts, the frontend is on google cloud stor
 ### Architecture
 For the short link id, I've used base62 encoding since there's less chance for collision than md5 and also added an atomic global counter which is in firestore, so that multiple instances of the service can run simultaneously without generating the same short id. I've also use cloud run so that I don't have to scale manually if the service was getting a lot of traffic, but one downside is that after some time the first request can be a little bit longer to respond since it needs to startup the container first. But if it was a real service with constant traffic it probably won't be a problem.
 
+### Frontend usage
+![Alt Text](https://storage.googleapis.com/www.fork.pw/fork-recording.gif)
+
 ## API
 The API consists of 4 primary endpoints.
 
