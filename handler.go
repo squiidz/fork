@@ -14,11 +14,11 @@ import (
 // HomeHandler is used in developement to get the index.html file
 // in production it just foward the root domain to www
 func HomeHandler(rw http.ResponseWriter, req *http.Request) {
-	if *env == "dev" {
+	if *env == devEnv {
 		http.ServeFile(rw, req, "fork-ui/dist/index.html")
 		return
 	}
-	http.Redirect(rw, req, "www.fork.pw", http.StatusMovedPermanently)
+	http.Redirect(rw, req, "https://www.fork.pw", http.StatusMovedPermanently)
 }
 
 // StaticHandler only provide a endpoint to get static files in developement

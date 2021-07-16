@@ -31,7 +31,7 @@ type Server struct {
 
 // NewServer initialize a new server instance and create the store
 func NewServer(env, url, port string) *Server {
-	if env == "dev" {
+	if env == devEnv {
 		url = fmt.Sprintf("%s:%s", url, port)
 	}
 	s, err := NewStore()
@@ -53,12 +53,12 @@ func main() {
 
 	srvr := NewServer(*env, *url, *intPort)
 
+	r.HandleFunc("/", HomeHandler)
 	r.Handle("/gen-link", allowCORS(http.HandlerFunc(srvr.GenerateLink))).Methods("POST", "OPTIONS")
 	r.Handle("/update-link", allowCORS(http.HandlerFunc(srvr.UpdateLink))).Methods("POST", "OPTIONS")
 	r.Handle("/info-link/{id}", allowCORS(http.HandlerFunc(srvr.InfoLink))).Methods("GET")
 	r.Handle("/{id}", allowCORS(http.HandlerFunc(srvr.FowardLinkHandler))).Methods("GET", "OPTIONS")
 
-	r.HandleFunc("/", HomeHandler)
 	if *env == devEnv {
 		r.PathPrefix("/").Handler(http.HandlerFunc(StaticHandler))
 	}
