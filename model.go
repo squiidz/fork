@@ -4,6 +4,7 @@ import (
 	"time"
 )
 
+// Link contains the info for a provided URL that have been shortened.
 type Link struct {
 	URL         string `json:"url"`
 	Short       string `json:"short"`
@@ -14,6 +15,7 @@ type Link struct {
 	LastUpdated int64  `json:"lastUpdated"`
 }
 
+// NewLink initialize a new link struct with base values.
 func NewLink(url string, count int64) (*Link, error) {
 	enc, err := EncodeURL(url, count)
 	if err != nil {

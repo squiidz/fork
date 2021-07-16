@@ -97,7 +97,7 @@ export default {
       fetch(`${this.baseURL}/update-link`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ "url": this.url, "new": this.updateUrl })
+        body: JSON.stringify({ "shortUrl": this.url, "newUrl": this.updateUrl })
       }).then(async (res) => {
         res.json().then((data) => {
           this.updateInfo(data);

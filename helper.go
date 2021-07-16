@@ -26,6 +26,8 @@ func newEncoder() (*basex.Encoding, error) {
 	return encoder, nil
 }
 
+// EncodeURL generate a base62 string with a counter to reduce the
+// possibilities of collision
 func EncodeURL(s string, count int64) (string, error) {
 	encoder, err := newEncoder()
 	if err != nil {
@@ -57,6 +59,9 @@ func prefixHTTP(url string) string {
 	return url
 }
 
+// IsUP verify that the remote site is up
+// if not it replace the url with a
+// WayBackMachine snapshot url of the website
 func IsUP(url string) (string, bool) {
 	_, err := http.Head(url)
 	if err != nil {

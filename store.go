@@ -16,11 +16,14 @@ var (
 	linkAlreadyExistsError = errors.New("Link Already exists")
 )
 
+// Store maintains the client for the firestore and the global counter
+// and provided basic set and get methods
 type Store struct {
 	*Counter
 	db *firestore.Client
 }
 
+// NewStore initialize a new store based on firestore with a counter
 func NewStore() (*Store, error) {
 	c, err := firestore.NewClient(context.Background(), projectID)
 	if err != nil {
@@ -43,6 +46,7 @@ func (s *Store) getCounter() error {
 	return nil
 }
 
+// AddURL adds a new link to the store
 func (s *Store) AddURL(ctx context.Context, l *Link) error {
 	if !s.linkExist(ctx, l.Short) {
 		_, err := s.db.Collection(linkColName).Doc(l.Short).Set(ctx, l)
@@ -51,6 +55,7 @@ func (s *Store) AddURL(ctx context.Context, l *Link) error {
 	return linkAlreadyExistsError
 }
 
+// GetURL gets a link from the store based on the provided short id
 func (s *Store) GetURL(ctx context.Context, id string) (*Link, error) {
 	snap, err := s.db.Collection(linkColName).Doc(id).Get(ctx)
 	if err != nil {
@@ -61,6 +66,7 @@ func (s *Store) GetURL(ctx context.Context, id string) (*Link, error) {
 	return l, nil
 }
 
+// GetURLInfo gets the info about a link without increasing the click count
 func (s *Store) GetURLInfo(ctx context.Context, id string) (*Link, error) {
 	snap, err := s.db.Collection(linkColName).Doc(id).Get(ctx)
 	if err != nil {
@@ -70,6 +76,7 @@ func (s *Store) GetURLInfo(ctx context.Context, id string) (*Link, error) {
 	return l, nil
 }
 
+// UpdateURL updates the link with the provided id with a new url
 func (s *Store) UpdateURL(ctx context.Context, id, url string) error {
 	_, err := s.db.Collection(linkColName).Doc(id).Update(ctx, []firestore.Update{
 		{

@@ -18,12 +18,16 @@ var (
 	intPort = flag.String("intPort", "8080", "--intPort 8080")
 )
 
+// Server contains the base URL for creating the short link urls
+// the store is a layer on top of firestore to store links and the
+// global counter.
 type Server struct {
 	URL   string
 	Port  string
 	Store *Store
 }
 
+// NewServer initialize a new server instance and create the store
 func NewServer(env, url, port string) *Server {
 	if env == "dev" {
 		url = fmt.Sprintf("%s:%s", url, port)
