@@ -1,0 +1,224 @@
+<template>
+  <div class="">
+    <h1>{{ msg }}</h1>
+    <input id="fork-input" v-model="url" placeholder="https://exemple.com"/>
+    <br><br>
+    <input id="update-input" v-model="updateUrl" placeholder="https://new-url.com" :hidden="hideUpdateInput"/>
+    <br>
+    <button id="fork-button" @click="generateLink" :disabled="generateBtnDisable">Generate</button>
+    <button id="update-button" @click="updateLink" :disabled="updateBtnDisable">Update</button>
+    <button id="update-button" @click="infoLink" :disabled="infoBtnDisable">Info</button>
+    <br>
+    <a :href="genUrl" class="text-dark" target="_blank" rel="noopener noreferrer" ref="genUrl">
+      {{ genUrl }}
+    </a>
+    <div id="info-list">
+      <ul :hidden="hideInfo">
+        <p>URL: {{ linkInfo["url"] }}</p>
+        <p>Short: {{ linkInfo["short"] }}</p>
+        <p>Click: {{ linkInfo["click"] }}</p>
+        <p>LastViewed: {{ linkInfo["lastViewed"] }}</p>
+        <p>LastUpdated: {{ linkInfo["lastUpdated"] }}</p>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Home',
+  props: {
+    msg: String
+  },
+
+  data() {
+    let apiURL = "https://fork.pw";
+    if (window.location.href.includes("localhost")) {
+      apiURL = "http://localhost:8080"
+    }
+      
+    return {
+      url: "",
+      genUrl: "",
+      updateUrl: "",
+      baseURL: apiURL,
+      generateBtnDisable: false,
+      updateBtnDisable: true,
+      hideUpdateInput: true,
+      infoBtnDisable: true,
+      hideInfo: true,
+      linkInfo: {
+        "url": "",
+        "short": "",
+        "click": 0,
+        "lastViewed": 0,
+        "lastUpdated": 0,
+      },
+      urlPattern: new RegExp('^(https?:\\/\\/)?'+ // protocol
+        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'), // fragment locator
+
+      linkPattern: new RegExp(`^${apiURL}\\/[a-zA-Z0-9]{5}`)
+    }
+  },
+  methods: {
+    generateLink() {
+      if (!this.isURL(this.url)) {
+        this.genUrl = "Invalid URL"
+        return
+      }
+      fetch(`${this.baseURL}/gen-link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ "url": this.url })
+      }).then(async (res) => {
+          const json = await res.json();
+          this.genUrl = json.genURL;
+      })
+    },
+    updateLink() {
+      if (!this.isURL(this.updateUrl)) {
+        this.genUrl = "Invalid new URL"
+        return
+      }
+      console.log(this.url)
+      //this.hideInfo = false;
+      fetch(`${this.baseURL}/update-link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ "url": this.url, "new": this.updateUrl })
+      }).then(async (res) => {
+        res.json().then((data) => {
+          this.updateInfo(data);
+        });
+      })
+    },
+    infoLink() {
+      let ss = this.url.split("/");
+      this.hideInfo = false;
+      fetch(`${this.baseURL}/info-link/${ss[ss.length-1]}`, {
+        method: "GET",
+      }).then(async (res) => {
+        res.json().then((data) => {
+          this.updateInfo(data);
+        });
+      })
+    },
+    updateInfo(json) {
+      console.log(json) 
+      this.linkInfo = {
+        "url": json["url"],
+        "short": json["short"],
+        "click": json["click"],
+        "lastViewed": this.convertUnixTimeStamp(json["lastViewed"]),
+        "lastUpdated": this.convertUnixTimeStamp(json["lastUpdated"]),
+      }
+      this.hideInfo = false;
+    },
+    isURL(str) {
+      return !!this.urlPattern.test(str);
+    },
+    isLink(str) {
+      return !!this.linkPattern.test(str)
+    },
+    convertUnixTimeStamp(unixTime) {
+      let d = new Date(unixTime * 1000)
+      return d;
+    },
+  },
+  watch: {
+    url(val) {
+      if (this.isLink(val)) {
+        this.generateBtnDisable = true;
+        this.updateBtnDisable = false;
+        this.infoBtnDisable = false;
+        this.hideUpdateInput = false;
+        this.genUrl = "";
+      } else {
+        this.generateBtnDisable = false;
+        this.updateBtnDisable = true;
+        this.infoBtnDisable = true;
+        this.hideUpdateInput = true;
+        this.hideInfo = true;
+      }
+    }
+  }
+
+}
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+/* h3 {
+  margin: 40px 0 0;
+}
+a {
+  color: #42b983;
+} */
+#info-list {
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+  display: table;
+}
+#fork-button {
+    width: auto;
+    border-radius: 5px;
+    border: 0px;
+    padding: 0.5rem 1rem;
+    color: #ffffff;
+    background: #42b983;
+    margin: 1rem;
+}
+#fork-button:disabled {
+    width: auto;
+    border-radius: 5px;
+    border: 0px;
+    padding: 0.5rem 1rem;
+    color: #ffffff;
+    background: #bfc4d4;
+    margin: 1rem;
+}
+#fork-button:active {
+  background-color: #42b983;
+  box-shadow: 0 3px #666;
+  transform: translateY(2px);
+}
+#fork-input, #update-input {
+    width: 30%;
+    min-width: 250px;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+#update-button {
+    width: auto;
+    border-radius: 5px;
+    border: 0px;
+    padding: 0.5rem 1rem;
+    color: #ffffff;
+    background: #425eb9;
+    margin: 1rem;
+}
+#update-button:disabled {
+    width: auto;
+    border-radius: 5px;
+    border: 0px;
+    padding: 0.5rem 1rem;
+    color: #ffffff;
+    background: #bfc4d4;
+    margin: 1rem;
+}
+#update-button:active {
+  background-color: #425eb9;
+  box-shadow: 0 5px #2f51be;
+  transform: translateY(4px);
+}
+pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+  .string { color: green; }
+  .number { color: darkorange; }
+  .boolean { color: blue; }
+  .null { color: magenta; }
+  .key { color: red; }
+</style>
