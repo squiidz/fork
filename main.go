@@ -55,8 +55,8 @@ func main() {
 
 	r.Handle("/gen-link", allowCORS(http.HandlerFunc(srvr.GenerateLink))).Methods("POST", "OPTIONS")
 	r.Handle("/update-link", allowCORS(http.HandlerFunc(srvr.UpdateLink))).Methods("POST", "OPTIONS")
-	r.HandleFunc("/info-link/{id}", http.HandlerFunc(srvr.InfoLink)).Methods("GET")
-	r.HandleFunc("/{id}", http.HandlerFunc(srvr.FowardLinkHandler)).Methods("GET", "OPTIONS")
+	r.Handle("/info-link/{id}", allowCORS(http.HandlerFunc(srvr.InfoLink))).Methods("GET")
+	r.Handle("/{id}", allowCORS(http.HandlerFunc(srvr.FowardLinkHandler))).Methods("GET", "OPTIONS")
 
 	r.HandleFunc("/", HomeHandler)
 	if *env == devEnv {
