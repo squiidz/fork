@@ -1,5 +1,24 @@
 # fork URL shortener
 test it here -> https://fork.pw
+
+### Build
+#### backend
+You need an google cloud platform account with firestore enable.
+
+https://firebase.google.com/docs/firestore/quickstart#go
+
+- `export GOOGLE_APPLICATION_CREDENTIALS=path/to/credentials.json`
+- `cd path/to/clone/fork`
+- `go build`
+- `./fork` 
+runs on port 8080 by default
+
+#### frontend
+- `cd path/to/clone/fork/fork-ui`
+- `npm run serve`
+
+go to http://localhost:8081
+
 ### Project structure
 The project is split into two parts, the backend which is written in Go, and the frontend in Vuejs 3. The frontend part is pretty simple since it's only used for ease of testing. For the backend, it uses firestore as a DB and global counter management.
 
