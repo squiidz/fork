@@ -5,7 +5,9 @@
     <br><br>
     <input id="update-input" v-model="updateUrl" placeholder="https://new-url.com" :hidden="hideUpdateInput"/>
     <br>
-    <button id="fork-button" @click="generateLink" :disabled="generateBtnDisable">Generate</button>
+    <button id="fork-button" @click="generateLink" :disabled="generateBtnDisable" :class="{buttonload: loading}">
+      Generate <span :hidden="!loading"><i class="fa fa-refresh fa-spin"></i></span>
+    </button>
     <button id="update-button" @click="updateLink" :disabled="updateBtnDisable">Update</button>
     <button id="update-button" @click="infoLink" :disabled="infoBtnDisable">Info</button>
     <br>
@@ -47,6 +49,7 @@ export default {
       hideUpdateInput: true,
       infoBtnDisable: true,
       hideInfo: true,
+      loading: false,
       linkInfo: {
         "url": "",
         "short": "",
@@ -68,6 +71,7 @@ export default {
         this.genUrl = "Invalid URL"
         return
       }
+      this.loading = true;
       fetch(`${this.baseURL}/gen-link`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -75,6 +79,7 @@ export default {
       }).then(async (res) => {
           const json = await res.json();
           this.genUrl = json.genURL;
+          this.loading = false;
       })
     },
     updateLink() {
@@ -221,4 +226,12 @@ pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
   .boolean { color: blue; }
   .null { color: magenta; }
   .key { color: red; }
+
+.buttonload {
+  background-color: #04AA6D; /* Green background */
+  border: none; /* Remove borders */
+  color: white; /* White text */
+  padding: 12px 24px; /* Some padding */
+  font-size: 16px; /* Set a font-size */
+}
 </style>
