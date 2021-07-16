@@ -26,16 +26,19 @@ type Shard struct {
 // initCounter creates a given number of shards as
 // subcollection of specified document.
 func (c *Counter) initCounter(ctx context.Context, docRef *firestore.DocumentRef) error {
-	// colRef := docRef.Collection("shards")
-	c.dRef = docRef
+	_, err := docRef.Collection("shards").Doc("0").Get(ctx)
+	if err == nil {
+		c.dRef = docRef
+		return nil
+	}
 	// Initialize each shard with count=0
-	// for num := 0; num < c.numShards; num++ {
-	// 	shard := Shard{0}
+	for num := 0; num < c.numShards; num++ {
+		shard := Shard{0}
 
-	// 	if _, err := colRef.Doc(strconv.Itoa(num)).Set(ctx, shard); err != nil {
-	// 		return fmt.Errorf("Set: %v", err)
-	// 	}
-	// }
+		if _, err := docRef.Collection("shards").Doc(strconv.Itoa(num)).Set(ctx, shard); err != nil {
+			return fmt.Errorf("Set: %v", err)
+		}
+	}
 	return nil
 }
 
