@@ -11,14 +11,19 @@
     <button id="update-button" @click="updateLink" :disabled="updateBtnDisable">Update</button>
     <button id="update-button" @click="infoLink" :disabled="infoBtnDisable">Info</button>
     <br>
-    <a :href="genUrl" class="text-dark" target="_blank" rel="noopener noreferrer" ref="genUrl">
-      {{ genUrl }}
-    </a>
+    <div :hidden="genUrl == ''">
+      <a :href="genUrl" class="text-dark" target="_blank" rel="noopener noreferrer" ref="genUrl">
+        {{ genUrl }} 
+      </a>
+      <button @click="copyURL" id="fork-button"><i class="fa fa-copy"></i></button>
+    </div>
     <div id="info-list">
       <ul :hidden="hideInfo">
         <p>URL: {{ linkInfo["url"] }}</p>
         <p>Short: {{ linkInfo["short"] }}</p>
         <p>Click: {{ linkInfo["click"] }}</p>
+        <p>UpdateCount : {{ linkInfo["updateCount"] }}</p>
+        <p>CreatedAt: {{ linkInfo["createdAt"] }}</p>
         <p>LastViewed: {{ linkInfo["lastViewed"] }}</p>
         <p>LastUpdated: {{ linkInfo["lastUpdated"] }}</p>
       </ul>
@@ -54,6 +59,8 @@ export default {
         "url": "",
         "short": "",
         "click": 0,
+        "updateCount": 0,
+        "createdAt": 0,
         "lastViewed": 0,
         "lastUpdated": 0,
       },
@@ -87,8 +94,6 @@ export default {
         this.genUrl = "Invalid new URL"
         return
       }
-      console.log(this.url)
-      //this.hideInfo = false;
       fetch(`${this.baseURL}/update-link`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -96,6 +101,8 @@ export default {
       }).then(async (res) => {
         res.json().then((data) => {
           this.updateInfo(data);
+          this.updateUrl = "";
+          this.genUrl = this.url;
         });
       })
     },
@@ -116,6 +123,8 @@ export default {
         "url": json["url"],
         "short": json["short"],
         "click": json["click"],
+        "updateCount": json["updateCount"],
+        "createdAt": this.convertUnixTimeStamp(json["createdAt"]),
         "lastViewed": this.convertUnixTimeStamp(json["lastViewed"]),
         "lastUpdated": this.convertUnixTimeStamp(json["lastUpdated"]),
       }
@@ -128,18 +137,22 @@ export default {
       return !!this.linkPattern.test(str)
     },
     convertUnixTimeStamp(unixTime) {
-      let d = new Date(unixTime * 1000)
+      let d = new Date(unixTime * 1000).toLocaleString("en-US")
       return d;
     },
+    async copyURL() {
+      await navigator.clipboard.writeText(this.genUrl);
+      alert("Copied to clipboard");
+    }
   },
   watch: {
     url(val) {
       if (this.isLink(val)) {
         this.generateBtnDisable = true;
-        this.updateBtnDisable = false;
         this.infoBtnDisable = false;
         this.hideUpdateInput = false;
         this.genUrl = "";
+        this.updateBtnDisable = false;
       } else {
         this.generateBtnDisable = false;
         this.updateBtnDisable = true;

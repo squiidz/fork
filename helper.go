@@ -33,7 +33,7 @@ func EncodeURL(s string, count int64) (string, error) {
 	}
 	s = fmt.Sprintf("%s%d", s, count)
 	encStr := encoder.Encode([]byte(s))
-	return encStr[len(encStr)-5:], nil
+	return encStr[len(encStr)-6:], nil
 }
 
 func allowCORS(handler http.Handler) http.Handler {

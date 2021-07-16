@@ -77,6 +77,10 @@ func (s *Store) UpdateURL(ctx context.Context, id, url string) error {
 			Value: url,
 		},
 		{
+			Path:  "UpdateCount",
+			Value: firestore.Increment(1),
+		},
+		{
 			Path:  "LastUpdated",
 			Value: time.Now().Unix(),
 		},
@@ -117,6 +121,8 @@ func mapToLink(m map[string]interface{}) *Link {
 	l.URL = m["URL"].(string)
 	l.Short = m["Short"].(string)
 	l.Click = m["Click"].(int64)
+	l.UpdateCount = m["UpdateCount"].(int64)
+	l.CreatedAt = m["CreatedAt"].(int64)
 	l.LastUpdated = m["LastUpdated"].(int64)
 	l.LastViewed = m["LastViewed"].(int64)
 	return l
