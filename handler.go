@@ -59,6 +59,12 @@ func (s *Server) GenerateLink(rw http.ResponseWriter, req *http.Request) {
 		rw.WriteHeader(http.StatusBadRequest)
 		return
 	}
+	if strings.Contains(data["url"], *url) {
+		log.Printf("self referencing request %s", data["url"])
+		rw.WriteHeader(http.StatusBadRequest)
+		rw.Write([]byte("self referencing url"))
+		return
+	}
 	pURL := prefixHTTP(data["url"])
 
 	count, err := s.Store.getCount(context.Background())
